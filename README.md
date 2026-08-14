@@ -74,3 +74,4 @@ git branch feature/week1-api-foundations
 git checkout feature/week1-api-foundations
 # push and open a PR into main on GitHub
 ```
+## Week 1 Status\nAll endpoints tested in Postman and working.
