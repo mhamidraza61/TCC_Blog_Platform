@@ -57,12 +57,6 @@ TCC_Blog_Platform/
 | PUT    | /api/posts/:id    | Update post             |
 | DELETE | /api/posts/:id    | Delete post              |
 
-## Notes for Week 2 (don't do yet, just context)
-
-- `User.password` is currently stored as plain text — Week 2 adds bcrypt
-  hashing before save, plus JWT-based login/register endpoints.
-- Authorization ("only the author can edit/delete their post") also lands
-  in Week 2, once JWT auth exists to identify the requester.
 
 ## Git Workflow
 
