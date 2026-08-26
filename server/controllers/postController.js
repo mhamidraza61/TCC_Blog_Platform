@@ -4,8 +4,16 @@ const Post = require("../models/Post");
 // @route   POST /api/posts
 const createPost = async (req, res, next) => {
   try {
-    const { title, content, tags, author } = req.body;
-    const post = await Post.create({ title, content, tags, author });
+    const { title, content, tags } = req.body;
+    // author comes from the logged-in user (set by the "protect"
+    // middleware), NEVER from the request body — otherwise anyone could
+    // send { "author": "<someone else's id>" } and post as them.
+    const post = await Post.create({
+      title,
+      content,
+      tags,
+      author: req.user._id,
+    });
     res.status(201).json(post);
   } catch (error) {
     next(error);

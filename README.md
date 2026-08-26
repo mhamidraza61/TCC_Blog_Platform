@@ -57,12 +57,55 @@ TCC_Blog_Platform/
 | PUT    | /api/posts/:id    | Update post             |
 | DELETE | /api/posts/:id    | Delete post              |
 
-## Notes for Week 2 (don't do yet, just context)
+## Week 2: Authentication & Authorization
 
-- `User.password` is currently stored as plain text — Week 2 adds bcrypt
-  hashing before save, plus JWT-based login/register endpoints.
-- Authorization ("only the author can edit/delete their post") also lands
-  in Week 2, once JWT auth exists to identify the requester.
+### New setup step
+
+Install the new dependencies (run this once):
+```
+cd server
+npm install
+```
+
+### New/changed endpoints
+
+| Method | Endpoint            | Auth required | Description                          |
+|--------|---------------------|----------------|---------------------------------------|
+| POST   | /api/auth/register  | No             | Create an account, returns a token   |
+| POST   | /api/auth/login     | No             | Log in, returns a token              |
+| POST   | /api/posts          | Yes            | Create a post (author = logged-in user) |
+| PUT    | /api/posts/:id      | Yes (author only) | Edit a post                       |
+| DELETE | /api/posts/:id      | Yes (author only) | Delete a post                     |
+
+`GET` endpoints for both users and posts remain public, same as Week 1.
+
+### How auth works here
+
+- Passwords are hashed with bcrypt automatically before saving (see the
+  `pre("save")` hook in `models/User.js`) — never stored as plain text.
+- `/api/auth/register` and `/api/auth/login` both return a JWT `token` in
+  the response.
+- To call a protected route, add a header:
+  `Authorization: Bearer <token>`
+- `middleware/authMiddleware.js` (`protect`) checks that token and attaches
+  the logged-in user to `req.user`.
+- `middleware/authorizationMiddleware.js` (`isPostAuthor`) then checks that
+  `req.user` is actually the author of the post being edited/deleted.
+- `express-rate-limit` caps register/login attempts at 20 per 15 minutes
+  per IP, to slow down brute-force guessing.
+- `helmet` sets a batch of security-related HTTP headers on every response.
+
+### Testing in Postman
+
+Use `postman/TCC_Blog_Platform_Week2.postman_collection.json`:
+
+1. Run **Auth → Register** (or Login if the user already exists). Copy the
+   `token` from the response into the collection's `token` variable.
+2. Run **Posts → Create Post (requires login)** — it uses that token
+   automatically.
+3. Try **Posts → Update Post (author only)** / **Delete** with a *different*
+   user's token to confirm you get a 403 Forbidden — that's the
+   authorization check working correctly.
 
 ## Git Workflow
 
@@ -74,4 +117,3 @@ git branch feature/week1-api-foundations
 git checkout feature/week1-api-foundations
 # push and open a PR into main on GitHub
 ```
-## Week 1 Status\nAll endpoints tested in Postman and working.
