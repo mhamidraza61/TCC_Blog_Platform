@@ -1,13 +1,9 @@
 const Post = require("../models/Post");
+const ERROR_MESSAGES = require("../constants/errorMessages");
 
-// @desc    Create a new post
-// @route   POST /api/posts
 const createPost = async (req, res, next) => {
   try {
     const { title, content, tags } = req.body;
-    // author comes from the logged-in user (set by the "protect"
-    // middleware), NEVER from the request body — otherwise anyone could
-    // send { "author": "<someone else's id>" } and post as them.
     const post = await Post.create({
       title,
       content,
@@ -20,8 +16,6 @@ const createPost = async (req, res, next) => {
   }
 };
 
-// @desc    Get all posts
-// @route   GET /api/posts
 const getPosts = async (req, res, next) => {
   try {
     const posts = await Post.find().populate("author", "name email");
@@ -31,8 +25,6 @@ const getPosts = async (req, res, next) => {
   }
 };
 
-// @desc    Get a single post by ID
-// @route   GET /api/posts/:id
 const getPostById = async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.id).populate(
@@ -41,7 +33,7 @@ const getPostById = async (req, res, next) => {
     );
     if (!post) {
       res.status(404);
-      throw new Error("Post not found");
+      throw new Error(ERROR_MESSAGES.POST.NOT_FOUND);
     }
     res.status(200).json(post);
   } catch (error) {
@@ -49,8 +41,6 @@ const getPostById = async (req, res, next) => {
   }
 };
 
-// @desc    Update a post
-// @route   PUT /api/posts/:id
 const updatePost = async (req, res, next) => {
   try {
     const post = await Post.findByIdAndUpdate(req.params.id, req.body, {
@@ -59,7 +49,7 @@ const updatePost = async (req, res, next) => {
     });
     if (!post) {
       res.status(404);
-      throw new Error("Post not found");
+      throw new Error(ERROR_MESSAGES.POST.NOT_FOUND);
     }
     res.status(200).json(post);
   } catch (error) {
@@ -67,14 +57,12 @@ const updatePost = async (req, res, next) => {
   }
 };
 
-// @desc    Delete a post
-// @route   DELETE /api/posts/:id
 const deletePost = async (req, res, next) => {
   try {
     const post = await Post.findByIdAndDelete(req.params.id);
     if (!post) {
       res.status(404);
-      throw new Error("Post not found");
+      throw new Error(ERROR_MESSAGES.POST.NOT_FOUND);
     }
     res.status(200).json({ message: "Post deleted" });
   } catch (error) {

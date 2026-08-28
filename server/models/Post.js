@@ -16,7 +16,6 @@ const postSchema = new mongoose.Schema(
       default: [],
     },
     author: {
-      // Reference to the User who wrote the post
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
