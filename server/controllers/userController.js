@@ -1,7 +1,6 @@
 const User = require("../models/User");
+const ERROR_MESSAGES = require("../constants/errorMessages");
 
-// @desc    Create a new user
-// @route   POST /api/users
 const createUser = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
@@ -12,8 +11,6 @@ const createUser = async (req, res, next) => {
   }
 };
 
-// @desc    Get all users
-// @route   GET /api/users
 const getUsers = async (req, res, next) => {
   try {
     const users = await User.find().select("-password");
@@ -23,14 +20,12 @@ const getUsers = async (req, res, next) => {
   }
 };
 
-// @desc    Get a single user by ID
-// @route   GET /api/users/:id
 const getUserById = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id).select("-password");
     if (!user) {
       res.status(404);
-      throw new Error("User not found");
+      throw new Error(ERROR_MESSAGES.USER.NOT_FOUND);
     }
     res.status(200).json(user);
   } catch (error) {
@@ -38,8 +33,6 @@ const getUserById = async (req, res, next) => {
   }
 };
 
-// @desc    Update a user
-// @route   PUT /api/users/:id
 const updateUser = async (req, res, next) => {
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {
@@ -48,7 +41,7 @@ const updateUser = async (req, res, next) => {
     }).select("-password");
     if (!user) {
       res.status(404);
-      throw new Error("User not found");
+      throw new Error(ERROR_MESSAGES.USER.NOT_FOUND);
     }
     res.status(200).json(user);
   } catch (error) {
@@ -56,14 +49,12 @@ const updateUser = async (req, res, next) => {
   }
 };
 
-// @desc    Delete a user
-// @route   DELETE /api/users/:id
 const deleteUser = async (req, res, next) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) {
       res.status(404);
-      throw new Error("User not found");
+      throw new Error(ERROR_MESSAGES.USER.NOT_FOUND);
     }
     res.status(200).json({ message: "User deleted" });
   } catch (error) {
