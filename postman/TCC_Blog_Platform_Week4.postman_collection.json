@@ -1,0 +1,150 @@
+{
+  "info": {
+    "name": "TCC Blog Platform - Week 4",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api" },
+    { "key": "userId", "value": "" },
+    { "key": "postId", "value": "" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Hamid Raza\",\n  \"email\": \"hamid@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/register"
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"hamid@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": { "method": "GET", "url": "{{baseUrl}}/users" }
+        },
+        {
+          "name": "Get User By ID",
+          "request": { "method": "GET", "url": "{{baseUrl}}/users/{{userId}}" }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Updated Name\"\n}" },
+            "url": "{{baseUrl}}/users/{{userId}}"
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/users/{{userId}}" }
+        }
+      ]
+    },
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "Create Post (with cover image)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "My First Post", "type": "text" },
+                { "key": "content", "value": "This is the content of my first post.", "type": "text" },
+                { "key": "tags", "value": "intro,mern", "type": "text" },
+                { "key": "coverImage", "type": "file", "src": [] }
+              ]
+            },
+            "url": "{{baseUrl}}/posts"
+          }
+        },
+        {
+          "name": "Create Post (no image)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Text-only Post\",\n  \"content\": \"No cover image on this one.\",\n  \"tags\": [\"intro\"]\n}"
+            },
+            "url": "{{baseUrl}}/posts"
+          }
+        },
+        {
+          "name": "Get All Posts",
+          "request": { "method": "GET", "url": "{{baseUrl}}/posts" }
+        },
+        {
+          "name": "Get Posts (page 2, limit 5)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/posts?page=2&limit=5" }
+        },
+        {
+          "name": "Get Posts (search)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/posts?search=react" }
+        },
+        {
+          "name": "Get Posts (filter by tag)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/posts?tag=mern" }
+        },
+        {
+          "name": "Get Posts (filter by author)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/posts?author={{userId}}" }
+        },
+        {
+          "name": "Get Post By ID",
+          "request": { "method": "GET", "url": "{{baseUrl}}/posts/{{postId}}" }
+        },
+        {
+          "name": "Update Post (author only)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Updated Title\"\n}" },
+            "url": "{{baseUrl}}/posts/{{postId}}"
+          }
+        },
+        {
+          "name": "Delete Post (author only)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/posts/{{postId}}"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -71,6 +71,13 @@ export default function PostDetail() {
           })}
         </time>
       </div>
+      {post.coverImage?.url && (
+        <img
+          src={post.coverImage.url}
+          alt=""
+          className="post-detail-image"
+        />
+      )}
       {post.tags?.length > 0 && (
         <div className="post-card-tags">
           {post.tags.map((tag) => (
