@@ -1,45 +1,53 @@
-import { createContext, useContext, useState } from "react";
-import api from "../api/axios";
+import { createContext, useContext, useEffect, useState } from "react";
+import * as authApi from "../api/authApi";
 
 const AuthContext = createContext(null);
 
-// Reads whatever was saved from a previous session, so refreshing the
-// page doesn't log the user out. localStorage persists across page
-// reloads (unlike plain useState, which resets to nothing on refresh).
-const getStoredUser = () => {
-  const stored = localStorage.getItem("user");
-  return stored ? JSON.parse(stored) : null;
-};
-
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(getStoredUser);
+  const [user, setUser] = useState(null);
+  // Starts true because on first load we don't yet know if there's a
+  // valid session cookie or not — we have to ask the backend. Every
+  // consumer of this context should wait for this to become false
+  // before deciding "show the logged-out UI."
+  const [loading, setLoading] = useState(true);
 
-  const persistSession = (data) => {
-    // data is the API response: { _id, name, email, token }
-    const { token, ...userData } = data;
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(userData));
-    setUser(userData);
+  // On first mount, ask the backend "who am I?" using whatever cookie
+  // the browser already has (if any). This replaces reading a token out
+  // of localStorage — since the token is httpOnly now, this app has no
+  // other way to know if a previous login is still valid.
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const data = await authApi.getMe();
+        setUser(data);
+      } catch {
+        // A 401 here just means "not logged in" — completely normal for
+        // a first-time visitor, not an error worth showing anyone.
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    checkSession();
+  }, []);
+
+  const register = async (values) => {
+    const data = await authApi.register(values);
+    setUser(data);
   };
 
-  const register = async ({ name, email, password }) => {
-    const { data } = await api.post("/auth/register", { name, email, password });
-    persistSession(data);
+  const login = async (values) => {
+    const data = await authApi.login(values);
+    setUser(data);
   };
 
-  const login = async ({ email, password }) => {
-    const { data } = await api.post("/auth/login", { email, password });
-    persistSession(data);
-  };
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+  const logout = async () => {
+    await authApi.logout();
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, register, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, register, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
