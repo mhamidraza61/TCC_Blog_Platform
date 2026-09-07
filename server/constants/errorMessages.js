@@ -44,6 +44,18 @@ const ERROR_MESSAGES = Object.freeze({
     DUPLICATE_FIELD: (field) => `Duplicate value entered for field: ${field}`,
     RATE_LIMITED: "Too many attempts, please try again later",
   }),
+
+  // Messages used directly inside Zod schemas (validators/authValidators.js).
+  // These live here too, instead of as inline strings in the schema, so
+  // there is exactly one source of truth for a given message no matter
+  // where in the app it's raised from — the same reasoning as the rest
+  // of this file, just applied to validation errors specifically.
+  VALIDATION: Object.freeze({
+    NAME_MIN_LENGTH: "Name must be at least 2 characters",
+    INVALID_EMAIL: "Enter a valid email address",
+    PASSWORD_MIN_LENGTH: "Password must be at least 6 characters",
+    PASSWORD_REQUIRED: "Password is required",
+  }),
 });
 
 module.exports = ERROR_MESSAGES;

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import api from "../api/axios";
+import * as postApi from "../api/postApi";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../components/Spinner";
 import ErrorBanner from "../components/ErrorBanner";
@@ -20,7 +20,7 @@ export default function PostDetail() {
 
     const fetchPost = async () => {
       try {
-        const { data } = await api.get(`/posts/${id}`);
+        const data = await postApi.getPostById(id);
         if (!cancelled) setPost(data);
       } catch (err) {
         if (!cancelled) {
@@ -41,7 +41,7 @@ export default function PostDetail() {
     if (!window.confirm("Delete this post? This can't be undone.")) return;
     setDeleting(true);
     try {
-      await api.delete(`/posts/${id}`);
+      await postApi.deletePost(id);
       navigate("/");
     } catch (err) {
       setError(err.response?.data?.message || "Couldn't delete this post.");

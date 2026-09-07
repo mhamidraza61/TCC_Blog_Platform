@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const helmet = require("helmet");
+const cookieParser = require("cookie-parser");
 const connectDB = require("./config/db");
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 
@@ -15,16 +16,19 @@ connectDB();
 const app = express();
 
 app.use(helmet());
-// In production, only your deployed frontend should be allowed to call
-// this API. Locally (no CLIENT_URL set, or it's the default localhost
-// value) this still behaves exactly like the wide-open cors() from
-// Weeks 1-3, so nothing changes for local development.
+// credentials: true is required for cookie-based auth — without it, the
+// browser refuses to send/accept the httpOnly cookie on cross-origin
+// requests (client on :5173, server on :5000 counts as cross-origin even
+// on localhost). This must be paired with withCredentials: true on the
+// frontend's Axios instance, or the cookie still won't be sent.
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:5173",
+    credentials: true,
   })
 );
 app.use(express.json());
+app.use(cookieParser());
 app.use(morgan("dev"));
 
 app.get("/", (req, res) => {

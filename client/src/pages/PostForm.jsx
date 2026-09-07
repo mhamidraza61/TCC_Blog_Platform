@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, useParams } from "react-router-dom";
-import api from "../api/axios";
+import * as postApi from "../api/postApi";
 import { postSchema } from "../validation/postSchema";
 import ErrorBanner from "../components/ErrorBanner";
 import Spinner from "../components/Spinner";
@@ -44,7 +44,7 @@ export default function PostForm() {
     let cancelled = false;
     const fetchPost = async () => {
       try {
-        const { data } = await api.get(`/posts/${id}`);
+        const data = await postApi.getPostById(id);
         if (!cancelled) {
           reset({
             title: data.title,
@@ -117,14 +117,10 @@ export default function PostForm() {
       }
 
       if (isEditMode) {
-        await api.put(`/posts/${id}`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await postApi.updatePost(id, formData);
         navigate(`/posts/${id}`);
       } else {
-        const { data } = await api.post("/posts", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        const data = await postApi.createPost(formData);
         navigate(`/posts/${data._id}`);
       }
     } catch (err) {

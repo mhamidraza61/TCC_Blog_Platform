@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import api from "../api/axios";
+import * as postApi from "../api/postApi";
 import PostCard from "../components/PostCard";
 import Spinner from "../components/Spinner";
 import ErrorBanner from "../components/ErrorBanner";
@@ -52,9 +52,7 @@ export default function Home() {
     const fetchPosts = async () => {
       setLoading(true);
       try {
-        const { data } = await api.get("/posts", {
-          params: { page, search: urlSearch || undefined, tag: tag || undefined },
-        });
+        const data = await postApi.getPosts({ page, search: urlSearch, tag });
         if (!cancelled) {
           setPosts(data.posts);
           setPagination(data.pagination);
